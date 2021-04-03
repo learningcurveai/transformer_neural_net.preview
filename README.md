@@ -1,2 +1,2 @@
 # transformer_neural_net.preview
-Code backing explanations in youtube videos
+Code used for explanations provided in youtube videos
