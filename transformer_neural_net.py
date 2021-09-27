@@ -4,31 +4,6 @@ from torch.utils.data import Dataset
 import torch.utils.data
 import math
 import torch.nn.functional as F
-
-class PositionEncodedEmbeddings(nn.Module):
-    def __init__(self, vocab_size, model_dim, max_len = max_sentence_length+1):
-        super(PositionEncodedEmbeddings, self).__init__()
-        self.model_dim = model_dim
-        self.embed = nn.Embedding(vocab_size, model_dim)
-        self.position_encoded_mat = self.create_positinal_encoding(max_len, model_dim)
-        
-    def create_positinal_encoding(self, max_len, model_dim):
-        position_encoded_mat = torch.zeros(max_len, model_dim).to(device)
-        # for each position of the word
-        for pos in range(max_len):
-            # for each dimension of the each position
-            for i in range(0, model_dim):
-                if (i % 2)==1:
-                    position_encoded_mat[pos, i] = math.cos(pos / (10000 ** ((2 * (i))/model_dim)))
-                else:
-                    position_encoded_mat[pos, i] = math.sin(pos / (10000 ** ((2 * (i))/model_dim)))
-        position_encoded_mat = position_encoded_mat.unsqueeze(0)
-        return position_encoded_mat
-        
-    def forward(self, encoded_words):
-        embedding = self.embed(encoded_words) * math.sqrt(self.model_dim)
-        embedding += self.position_encoded_mat[:, :embedding.size(1)]
-        return embedding
         
 class MultiHeadAttention(nn.Module):
     
@@ -143,6 +118,31 @@ class Decoder(nn.Module):
         decoded_output = self.layernorm(feed_forward_out + interaction)
         
         return decoded_output
+    
+class PositionEncodedEmbeddings(nn.Module):
+    def __init__(self, vocab_size, model_dim, max_len = max_sentence_length+1):
+        super(PositionEncodedEmbeddings, self).__init__()
+        self.model_dim = model_dim
+        self.embed = nn.Embedding(vocab_size, model_dim)
+        self.position_encoded_mat = self.create_positinal_encoding(max_len, model_dim)
+        
+    def create_positinal_encoding(self, max_len, model_dim):
+        position_encoded_mat = torch.zeros(max_len, model_dim).to(device)
+        # for each position of the word
+        for pos in range(max_len):
+            # for each dimension of the each position
+            for i in range(0, model_dim):
+                if (i % 2)==1:
+                    position_encoded_mat[pos, i] = math.cos(pos / (10000 ** ((2 * (i))/model_dim)))
+                else:
+                    position_encoded_mat[pos, i] = math.sin(pos / (10000 ** ((2 * (i))/model_dim)))
+        position_encoded_mat = position_encoded_mat.unsqueeze(0)
+        return position_encoded_mat
+        
+    def forward(self, encoded_words):
+        embedding = self.embed(encoded_words) * math.sqrt(self.model_dim)
+        embedding += self.position_encoded_mat[:, :embedding.size(1)]
+        return embedding
     
 class Transformer(nn.Module):
     
