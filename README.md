@@ -1,4 +1,5 @@
-# transformer_neural_net.preview (For educational purposes only)
+# transformer_neural_net.preview 
+
 Implementation supporting explanations provided in learningcurve.ai youtube videos:
 
 Attention Mechanism Algorithm Animated: https://youtu.be/lmepFoddjgQ
